@@ -1,0 +1,8 @@
+../Core/Src/simple_protocol.c:19:16:IsCardRegistered	24	static
+../Core/Src/simple_protocol.c:28:16:RegisterCard	16	static
+../Core/Src/simple_protocol.c:37:6:SimpleProtocol_SendRegisteredCard	32	static
+../Core/Src/simple_protocol.c:48:6:SimpleProtocol_SendUnregisteredCard	24	static
+../Core/Src/simple_protocol.c:58:6:SimpleProtocol_ProcessCardDetection	16	static
+../Core/Src/simple_protocol.c:69:6:SimpleProtocol_ProcessReceivedData	32	static
+../Core/Src/simple_protocol.c:178:6:SimpleProtocol_Init	16	static
+../Core/Src/simple_protocol.c:192:6:SimpleProtocol_PrintRegisteredCards	32	static
