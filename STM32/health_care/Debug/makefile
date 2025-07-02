@@ -60,8 +60,8 @@ all: main-build
 main-build: health_care.elf secondary-outputs
 
 # Tool invocations
-health_care.elf health_care.map: $(OBJS) $(USER_OBJS) D:\Nhung\STM32\health_care\STM32F429ZITX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-gcc -o "health_care.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"D:\Nhung\STM32\health_care\STM32F429ZITX_FLASH.ld" --specs=nosys.specs -Wl,-Map="health_care.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+health_care.elf health_care.map: $(OBJS) $(USER_OBJS) D:\Nhung\Health_care\STM32\health_care\STM32F429ZITX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-gcc -o "health_care.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"D:\Nhung\Health_care\STM32\health_care\STM32F429ZITX_FLASH.ld" --specs=nosys.specs -Wl,-Map="health_care.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 

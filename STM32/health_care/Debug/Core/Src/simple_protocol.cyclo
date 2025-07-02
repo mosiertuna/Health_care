@@ -5,4 +5,4 @@
 ../Core/Src/simple_protocol.c:58:6:SimpleProtocol_ProcessCardDetection	2
 ../Core/Src/simple_protocol.c:69:6:SimpleProtocol_ProcessReceivedData	18
 ../Core/Src/simple_protocol.c:178:6:SimpleProtocol_Init	1
-../Core/Src/simple_protocol.c:192:6:SimpleProtocol_PrintRegisteredCards	2
+../Core/Src/simple_protocol.c:200:6:SimpleProtocol_PrintRegisteredCards	2
