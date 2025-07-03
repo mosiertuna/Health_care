@@ -33,11 +33,24 @@ void HX711_Tare(void);
 void HX711_SetOffset(int32_t offset);
 void HX711_PowerDown(void);
 void HX711_PowerUp(void);
-void HAL_Delay_us(uint32_t us);
+
+// New functions for your algorithm
+void microDelay(uint16_t delay);
+int32_t getHX711(void);
+int weigh(void);
+void HX711_Tare_New(void);
+void HX711_SetCalibration(float known_weight_mg, float hx711_reading);
+uint32_t HX711_GetTare(void);
+float HX711_GetCalibrationCoefficient(void);
+float HX711_ReadWeight_Primary(void);
 
 // Global variables
 extern float hx711_scale;
 extern int32_t hx711_offset;
+extern uint32_t tare;
+extern float knownOriginal;
+extern float knownHX711;
+extern int weight;
 
 #ifdef __cplusplus
 }

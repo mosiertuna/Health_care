@@ -37,23 +37,24 @@ static uint8_t RegisterCard(uint8_t* uid) {
 
 void SimpleProtocol_SendRegisteredCard(uint8_t* uid, float weight) {
     uint8_t buffer[11];
-    buffer[0] = PROTOCOL_START_BYTE;
-    buffer[1] = MSG_TYPE_CARD_REGISTERED;
-    memcpy(&buffer[2], uid, 4);
-    memcpy(&buffer[6], &weight, 4);
-    buffer[10] = PROTOCOL_END_BYTE;
+    buffer[0] = PROTOCOL_START_BYTE;         // 0xAA
+    buffer[1] = MSG_TYPE_CARD_DETECTED;      // 0x01 (use unified type)
+    memcpy(&buffer[2], uid, 4);              // 4 bytes UID
+    memcpy(&buffer[6], &weight, 4);          // 4 bytes weight (float)
+    buffer[10] = PROTOCOL_END_BYTE;          // 0x55
     
     HAL_UART_Transmit(&huart1, buffer, 11, 1000);
 }
 
-void SimpleProtocol_SendUnregisteredCard(uint8_t* uid) {
-    uint8_t buffer[7];
-    buffer[0] = PROTOCOL_START_BYTE;
-    buffer[1] = MSG_TYPE_CARD_UNREGISTERED;
-    memcpy(&buffer[2], uid, 4);
-    buffer[6] = PROTOCOL_END_BYTE;
+void SimpleProtocol_SendUnregisteredCard(uint8_t* uid, float weight) {
+    uint8_t buffer[11];
+    buffer[0] = PROTOCOL_START_BYTE;         // 0xAA
+    buffer[1] = MSG_TYPE_CARD_DETECTED;      // 0x01 (use unified type)
+    memcpy(&buffer[2], uid, 4);              // 4 bytes UID
+    memcpy(&buffer[6], &weight, 4);          // 4 bytes weight (float)
+    buffer[10] = PROTOCOL_END_BYTE;          // 0x55
     
-    HAL_UART_Transmit(&huart1, buffer, 7, 1000);
+    HAL_UART_Transmit(&huart1, buffer, 11, 1000);
 }
 
 void SimpleProtocol_SendACK(uint8_t msgType) {
@@ -67,11 +68,8 @@ void SimpleProtocol_SendACK(uint8_t msgType) {
 }
 
 void SimpleProtocol_ProcessCardDetection(uint8_t* uid, float weight) {
-    if (IsCardRegistered(uid)) {
-        SimpleProtocol_SendRegisteredCard(uid, weight);
-    } else {
-        SimpleProtocol_SendUnregisteredCard(uid);
-    }
+    // Send all cards with same format - ESP32 will validate
+    SimpleProtocol_SendRegisteredCard(uid, weight);
 }
 
 void SimpleProtocol_PushReceivedByte(uint8_t byte) {

@@ -14,7 +14,8 @@ extern "C" {
 // Protocol constants
 #define PROTOCOL_START_BYTE     0xAA
 #define PROTOCOL_END_BYTE       0x55
-#define MSG_TYPE_CARD_REGISTERED    0x01
+#define MSG_TYPE_CARD_DETECTED      0x01  // Unified message type for all cards
+#define MSG_TYPE_CARD_REGISTERED    0x01  // Legacy - same as detected
 #define MSG_TYPE_CARD_UNREGISTERED  0x02
 #define MSG_TYPE_REGISTER_CARD      0x03
 #define MSG_TYPE_VALID_CARDS        0x04

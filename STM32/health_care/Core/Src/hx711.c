@@ -8,10 +8,86 @@
 /* USER CODE END Header */
 
 #include "hx711.h"
+#include "main.h"
 
-// Global variables
+// Global variables for your algorithm
+uint32_t tare = 0; 
+float knownOriginal = 1000.0f;  // Known weight in milligrams (1000mg = 1g)
+float knownHX711 = 1.0f;        // Will be calibrated
+int weight;
+
+// Legacy global variables (kept for compatibility)
 float hx711_scale = 1.0f;
 int32_t hx711_offset = 0;
+
+// External timer handle
+extern TIM_HandleTypeDef htim2;
+
+/**
+ * @brief Microsecond delay using timer
+ */
+void microDelay(uint16_t delay) {
+    __HAL_TIM_SET_COUNTER(&htim2, 0);
+    while (__HAL_TIM_GET_COUNTER(&htim2) < delay);
+}
+
+/**
+ * @brief Get raw data from HX711 using your algorithm
+ */
+int32_t getHX711(void) {
+    uint32_t data = 0;
+    uint32_t startTime = HAL_GetTick();
+    
+    // Wait for HX711 to be ready with timeout
+    while(HAL_GPIO_ReadPin(HX711_DT_GPIO_Port, HX711_DT_Pin) == GPIO_PIN_SET) {
+        if(HAL_GetTick() - startTime > 200)
+            return 0;
+    }
+    
+    // Read 24 bits
+    for(int8_t len = 0; len < 24; len++) {
+        HAL_GPIO_WritePin(HX711_SCK_GPIO_Port, HX711_SCK_Pin, GPIO_PIN_SET);
+        microDelay(1);
+        data = data << 1;
+        HAL_GPIO_WritePin(HX711_SCK_GPIO_Port, HX711_SCK_Pin, GPIO_PIN_RESET);
+        microDelay(1);
+        if(HAL_GPIO_ReadPin(HX711_DT_GPIO_Port, HX711_DT_Pin) == GPIO_PIN_SET)
+            data++;
+    }
+    
+    data = data ^ 0x800000;
+    
+    // Extra pulse for next reading
+    HAL_GPIO_WritePin(HX711_SCK_GPIO_Port, HX711_SCK_Pin, GPIO_PIN_SET);
+    microDelay(1);
+    HAL_GPIO_WritePin(HX711_SCK_GPIO_Port, HX711_SCK_Pin, GPIO_PIN_RESET);
+    microDelay(1);
+    
+    return data;
+}
+
+/**
+ * @brief Weigh function using your algorithm - optimized for speed
+ */
+int weigh() {
+    int32_t total = 0;
+    int32_t samples = 10;  // Reduced from 50 to 10 for faster response
+    int milligram;
+    float coefficient;
+    
+    for(uint16_t i = 0; i < samples; i++) {
+        int32_t reading = getHX711();
+        if (reading != 0) {  // Only add valid readings
+            total += reading;
+        }
+    }
+    
+    int32_t average = (int32_t)(total / samples);
+    coefficient = knownOriginal / knownHX711;
+    milligram = (int)(average - tare) * coefficient;
+    
+    return milligram;
+}
 
 /**
  * @brief Initialize HX711
@@ -30,86 +106,73 @@ uint8_t HX711_IsReady(void) {
 }
 
 /**
- * @brief Read raw data from HX711
+ * @brief Tare function using your algorithm - optimized for speed
  */
-uint32_t HX711_ReadRaw(uint8_t channel) {
-    uint32_t data = 0;
-    uint8_t i;
-    uint8_t pulses;
+void HX711_Tare_New(void) {
+    int32_t total = 0;
+    int32_t samples = 5;  // Reduced from 10 to 5 for faster tare
     
-    // Wait for HX711 to be ready
-    while (!HX711_IsReady()) {
-        HAL_Delay(1);
-    }
-    
-    // Read 24 bits
-    for (i = 0; i < 24; i++) {
-        HAL_GPIO_WritePin(HX711_SCK_GPIO_Port, HX711_SCK_Pin, GPIO_PIN_SET);
-        HAL_Delay_us(1);
-        data <<= 1;
-        if (HAL_GPIO_ReadPin(HX711_DT_GPIO_Port, HX711_DT_Pin) == GPIO_PIN_SET) {
-            data |= 1;
+    for(uint16_t i = 0; i < samples; i++) {
+        int32_t reading = getHX711();
+        if (reading != 0) {
+            total += reading;
         }
-        HAL_GPIO_WritePin(HX711_SCK_GPIO_Port, HX711_SCK_Pin, GPIO_PIN_RESET);
-        HAL_Delay_us(1);
+        HAL_Delay(20);  // Reduced from 50ms to 20ms
     }
     
-    // Set channel and gain for next reading
-    switch (channel) {
-        case HX711_CHANNEL_A_GAIN_128:
-            pulses = 1;
-            break;
-        case HX711_CHANNEL_B_GAIN_32:
-            pulses = 2;
-            break;
-        case HX711_CHANNEL_A_GAIN_64:
-            pulses = 3;
-            break;
-        default:
-            pulses = 1;
-            break;
-    }
-    
-    for (i = 0; i < pulses; i++) {
-        HAL_GPIO_WritePin(HX711_SCK_GPIO_Port, HX711_SCK_Pin, GPIO_PIN_SET);
-        HAL_Delay_us(1);
-        HAL_GPIO_WritePin(HX711_SCK_GPIO_Port, HX711_SCK_Pin, GPIO_PIN_RESET);
-        HAL_Delay_us(1);
-    }
-    
-    // Convert to signed 24-bit value
-    if (data & 0x800000) {
-        data |= 0xFF000000;
-    }
-    
-    return data;
+    tare = total / samples;
 }
 
 /**
- * @brief Read value with offset compensation
+ * @brief Set calibration values
  */
+void HX711_SetCalibration(float known_weight_mg, float hx711_reading) {
+    knownOriginal = known_weight_mg;
+    knownHX711 = hx711_reading;
+}
+
+/**
+ * @brief Get current tare value
+ */
+uint32_t HX711_GetTare(void) {
+    return tare;
+}
+
+/**
+ * @brief Get calibration coefficient
+ */
+float HX711_GetCalibrationCoefficient(void) {
+    if (knownHX711 == 0) return 1.0f;
+    return knownOriginal / knownHX711;
+}
+
+/**
+ * @brief Read weight using your primary algorithm
+ */
+float HX711_ReadWeight_Primary(void) {
+    int weight_mg = weigh();
+    return (float)weight_mg / 1000.0f; // Convert mg to grams
+}
+
+// Legacy functions for compatibility
+uint32_t HX711_ReadRaw(uint8_t channel) {
+    (void)channel; // Suppress unused parameter warning
+    return (uint32_t)getHX711();
+}
+
 int32_t HX711_ReadValue(uint8_t channel) {
     return (int32_t)HX711_ReadRaw(channel) - hx711_offset;
 }
 
-/**
- * @brief Read weight in grams
- */
 float HX711_ReadWeight(void) {
     int32_t value = HX711_ReadValue(HX711_CHANNEL_A_GAIN_128);
     return (float)value / hx711_scale;
 }
 
-/**
- * @brief Set scale factor
- */
 void HX711_SetScale(float scale) {
     hx711_scale = scale;
 }
 
-/**
- * @brief Tare the scale (set current reading as zero)
- */
 void HX711_Tare(void) {
     uint32_t sum = 0;
     uint8_t i;
@@ -123,38 +186,16 @@ void HX711_Tare(void) {
     hx711_offset = sum / HX711_TARE_SAMPLES;
 }
 
-/**
- * @brief Set offset manually
- */
 void HX711_SetOffset(int32_t offset) {
     hx711_offset = offset;
 }
 
-/**
- * @brief Power down HX711
- */
 void HX711_PowerDown(void) {
     HAL_GPIO_WritePin(HX711_SCK_GPIO_Port, HX711_SCK_Pin, GPIO_PIN_SET);
-    HAL_Delay_us(60);
+    microDelay(60);
 }
 
-/**
- * @brief Power up HX711
- */
 void HX711_PowerUp(void) {
     HAL_GPIO_WritePin(HX711_SCK_GPIO_Port, HX711_SCK_Pin, GPIO_PIN_RESET);
     HAL_Delay(10);
-}
-
-/**
- * @brief Microsecond delay function
- * @note This is a simple implementation, for more precise timing use DWT or TIM
- */
-void HAL_Delay_us(uint32_t us) {
-    uint32_t start = DWT->CYCCNT;
-    uint32_t cycles = us * (SystemCoreClock / 1000000);
-    
-    while ((DWT->CYCCNT - start) < cycles) {
-        // Wait
-    }
 }

@@ -147,36 +147,35 @@ void System_Init(void) {
     HX711_Init();
     Debug_Printf("HX711 weight sensor initialized\r\n");
     
+    // Start timer for microsecond delays
+    HAL_TIM_Base_Start(&htim2);
+    Debug_Printf("Timer2 started for microsecond delays\r\n");
+    
     // Initialize Simple Protocol
     SimpleProtocol_Init();
     Debug_Printf("Simple Protocol initialized\r\n");
-    
-    // Enable DWT for microsecond delays (used by HX711)
-    CoreDebug->DEMCR |= CoreDebug_DEMCR_TRCENA_Msk;
-    DWT->CTRL |= DWT_CTRL_CYCCNTENA_Msk;
     
     // Wait for system stabilization
     Debug_Printf("System stabilizing...\r\n");
     HAL_Delay(SYSTEM_INIT_DELAY_MS);
     
-    // Tare the scale
-    Debug_Printf("Taring scale...\r\n");
-    HX711_Tare();
+    // Tare the scale using new algorithm
+    Debug_Printf("Taring scale with new algorithm...\r\n");
+    HX711_Tare_New();
     
     // Debug: Check tare result
-    char tare_result[100];
-    snprintf(tare_result, sizeof(tare_result), "Tare completed. Offset: %ld\r\n", hx711_offset);
-    Debug_Printf(tare_result);
+    uint32_t tare_value = HX711_GetTare();
+    Debug_Printf("Tare completed. Tare value: %lu\r\n", tare_value);
     
-    // Set scale factor (this should be calibrated for your specific load cell)
-    HX711_SetScale(HX711_DEFAULT_SCALE);
-    Debug_Printf("Scale factor set to %.1f\r\n", HX711_DEFAULT_SCALE);
+    // Set default calibration (should be adjusted with real calibration)
+    HX711_SetCalibration(1000.0f, 1.0f); // 1000mg for 1 unit difference
+    Debug_Printf("Default calibration set: 1000mg = 1 unit\r\n");
     
-    // CRITICAL: Test float printing capability
-    float test_value = 123.45f;
-    char float_test[80];
-    snprintf(float_test, sizeof(float_test), "Float test 123.45: %.2f\r\n", test_value); // @suppress("Float formatting support")
-    Debug_Printf(float_test);
+    // Test weight reading
+    Debug_Printf("Testing weight reading...\r\n");
+    int test_weight_mg = weigh();
+    float test_weight_g = (float)test_weight_mg / 1000.0f;
+    Debug_Printf("Current weight: %dmg (%.1fg)\r\n", test_weight_mg, test_weight_g);
     
     // Debug: Verify scale was set correctly
     char scale_verify[100];
@@ -235,7 +234,7 @@ void Process_RFID(void) {
         uint8_t same_card = (memcmp(card_uid, last_card_uid, UID_SIZE) == 0);
         
         // Only process if it's a new card or enough time has passed
-        if (!same_card || (current_time - last_card_read_time > RC522_CARD_DETECTION_DELAY_MS)) {
+        if (!same_card || (current_time - last_card_read_time > 500)) {  // Reduced from 1000ms to 500ms
             
             // Reset card sent flag for new card
             if (!same_card) {
@@ -244,17 +243,18 @@ void Process_RFID(void) {
             
             // Only send once per card detection
             if (!card_sent) {
-                // Get current weight if HX711 is ready
+                // Get current weight using your weigh() function
                 float weight = 0.0f;
-                if (HX711_Enhanced_IsReady()) {
-                    uint32_t raw_data = HX711_ReadRaw(HX711_CHANNEL_A_GAIN_128);
-                    if (raw_data != 0xFFFFFFFF && raw_data != 0x00000000) {
-                        // Simple weight calculation
-                        int32_t value_with_offset = (int32_t)raw_data - hx711_offset;
-                        weight = (float)value_with_offset / hx711_scale;
-                        weight *= 1000.0f; // Convert to grams
-                    }
-                }
+                
+                // Use your primary weigh algorithm
+                int weight_mg = weigh();
+                
+                // Convert milligrams to grams
+                weight = (float)weight_mg / 1000.0f;
+                
+                // Validate weight range (0-5000g is reasonable)
+                if (weight < 0) weight = 0.0f;
+                if (weight > 5000.0f) weight = 0.0f;
                 
                 // Send data using simple protocol
                 SimpleProtocol_ProcessCardDetection(card_uid, weight);
@@ -440,6 +440,7 @@ int main(void)
   MX_GPIO_Init();
   MX_SPI1_Init();
   MX_USART1_UART_Init();
+  MX_TIM2_Init();  // Timer for microsecond delays
 
   /* USER CODE BEGIN 2 */
   System_Init();
@@ -450,7 +451,7 @@ int main(void)
   {
     /* USER CODE END WHILE */
     Process_RFID();
-    HAL_Delay(100);
+    HAL_Delay(50);  // Reduced from 100ms to 50ms for faster response
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */
