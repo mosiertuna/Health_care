@@ -54,9 +54,9 @@ extern "C" {
 
 /* Exported functions prototypes ---------------------------------------------*/
 void Error_Handler(void);
+void System_Error_Handler(const char* file, int line, const char* func);
 
 /* USER CODE BEGIN EFP */
-void System_Error_Handler(const char* file, int line, const char* function);
 void Debug_Printf(const char* format, ...);
 /* USER CODE END EFP */
 

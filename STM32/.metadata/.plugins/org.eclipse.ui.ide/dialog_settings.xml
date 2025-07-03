@@ -9,6 +9,8 @@
 		<item key="SmartImportRootWizardPage.STORE_NESTED_PROJECTS" value="true"/>
 		<item key="SmartImportRootWizardPage.STORE_CONFIGURE_NATURES" value="true"/>
 		<list key="org.eclipse.ui.internal.wizards.datatransfer.SmartImportRootWizardPage.knownSources">
+			<item value="D:\Nhung"/>
+			<item value="D:\Nhung\Health_care\STM32"/>
 			<item value="C:\TouchGFXProjects\MyApplication_4\STM32CubeIDE\Application"/>
 			<item value="E:\STM32\Project"/>
 		</list>

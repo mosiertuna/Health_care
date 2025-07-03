@@ -1,18 +1,20 @@
 /* USER CODE BEGIN Header */
 /**
- * Healthcare RFID System - STM32F429I Main Controller
- * STM32-ESP32 RFID/Weight System
- */
+  ******************************************************************************
+  * @file           : main.c
+  * @brief          : Main program body
+  ******************************************************************************
+  */
 /* USER CODE END Header */
+
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "simple_protocol.h"
 #include <stdio.h>
-#include <stdarg.h>
 #include <string.h>
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "simple_protocol.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -40,7 +42,16 @@ UART_HandleTypeDef huart1;
 /* USER CODE BEGIN PV */
 // External declarations for debug UART
 #if ENABLE_DEBUG_UART
-extern UART_HandleTypeDef DEBUG_UART_HANDLE;
+void Debug_Printf(const char* format, ...) {
+    char buffer[256];
+    va_list args;
+    va_start(args, format);
+    vsnprintf(buffer, sizeof(buffer), format, args);
+    va_end(args);
+    for (int i = 0; buffer[i]; i++) {
+        ITM_SendChar(buffer[i]); // Gửi qua ITM Port 0
+    }
+}
 #endif
 /* USER CODE END PV */
 
@@ -48,10 +59,21 @@ extern UART_HandleTypeDef DEBUG_UART_HANDLE;
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_SPI1_Init(void);
-static void MX_TIM2_Init(void);
+__attribute__((unused)) static void MX_TIM2_Init(void);
 static void MX_USART1_UART_Init(void);
 /* USER CODE BEGIN PFP */
-
+void System_Error_Handler(const char* file, int line, const char* func) {
+    // Basic error handler with debug info
+    while(1) {
+#if ENABLE_DEBUG_UART
+        char error_msg[256];
+        snprintf(error_msg, sizeof(error_msg), "Error in %s:%d (%s)\r\n", file, line, func);
+        Debug_Printf(error_msg);
+#endif
+        HAL_GPIO_TogglePin(GPIOG, GPIO_PIN_13); // Toggle LED to indicate error
+        HAL_Delay(200);
+    }
+}
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -153,12 +175,12 @@ void System_Init(void) {
     // CRITICAL: Test float printing capability
     float test_value = 123.45f;
     char float_test[80];
-    snprintf(float_test, sizeof(float_test), "Float test 123.45: %.2f\r\n", test_value);
+    snprintf(float_test, sizeof(float_test), "Float test 123.45: %.2f\r\n", test_value); // @suppress("Float formatting support")
     Debug_Printf(float_test);
     
     // Debug: Verify scale was set correctly
     char scale_verify[100];
-    snprintf(scale_verify, sizeof(scale_verify), "Verified scale: %.3f\r\n", hx711_scale);
+    snprintf(scale_verify, sizeof(scale_verify), "Verified scale: %.3f\r\n", hx711_scale); // @suppress("Float formatting support")
     Debug_Printf(scale_verify);
     
     // Force fix if scale is still invalid
@@ -166,7 +188,7 @@ void System_Init(void) {
         Debug_Printf("ERROR: Scale still invalid after set! Force fixing...\r\n");
         hx711_scale = 420.0f; // Force assignment with known value
         char force_fix[100];
-        snprintf(force_fix, sizeof(force_fix), "Force fixed scale to: %.3f\r\n", hx711_scale);
+        snprintf(force_fix, sizeof(force_fix), "Force fixed scale to: %.3f\r\n", hx711_scale); // @suppress("Float formatting support")
         Debug_Printf(force_fix);
     } else {
         Debug_Printf("Scale appears to be set correctly.\r\n");
@@ -410,191 +432,26 @@ void System_Test(void) {
   */
 int main(void)
 {
-
-  /* USER CODE BEGIN 1 */
-
-  /* USER CODE END 1 */
-
   /* MCU Configuration--------------------------------------------------------*/
-
-  /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
   HAL_Init();
-
-  /* USER CODE BEGIN Init */
-
-  /* USER CODE END Init */
-
-  /* Configure the system clock */
   SystemClock_Config();
-
-  /* USER CODE BEGIN SysInit */
-
-  /* USER CODE END SysInit */
-
-  // Initialize all configured peripherals
+  
+  /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_SPI1_Init();
-  MX_TIM2_Init();
   MX_USART1_UART_Init();
-  /* USER CODE BEGIN 2 */
-  
-  // Initialize all system modules
-  System_Init();
-  
-  // Initialize simple protocol
-  SimpleProtocol_Init();
-  
-  // Hold CS high for a moment
-  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_0, GPIO_PIN_SET);
-  HAL_Delay(50);
-  
-  // Perform soft reset
-  RC522_WriteRegister(RC522_REG_COMMAND, RC522_CMD_SOFT_RESET);
-  HAL_Delay(100);  // Wait for reset to complete
-  
-  // Wait for oscillator to stabilize
-  HAL_Delay(100);
-  
-  const char* reset_done = "RC522 reset completed\r\n";
-  HAL_UART_Transmit(&huart1, (uint8_t*)reset_done, strlen(reset_done), 1000);
-  
-  // Test SPI communication first
-  const char* test_spi = "Testing SPI communication...\r\n";
-  HAL_UART_Transmit(&huart1, (uint8_t*)test_spi, strlen(test_spi), 1000);
-  
-  // Manual SPI test - toggle CS and send dummy data
-  const char* test_cs = "Testing CS pin control...\r\n";
-  HAL_UART_Transmit(&huart1, (uint8_t*)test_cs, strlen(test_cs), 1000);
-  
-  for (int i = 0; i < 3; i++) {
-    // Pull CS low
-    HAL_GPIO_WritePin(GPIOB, GPIO_PIN_0, GPIO_PIN_RESET);
-    HAL_Delay(10);  // Longer CS setup time
-    
-    // Send test data
-    uint8_t test_data = 0x55; // Pattern 01010101
-    uint8_t received = 0;
-    HAL_StatusTypeDef spi_result = HAL_SPI_TransmitReceive(&hspi1, &test_data, &received, 1, 1000);
-    
-    // Pull CS high
-    HAL_GPIO_WritePin(GPIOB, GPIO_PIN_0, GPIO_PIN_SET);
-    
-    char spi_test[80];
-    snprintf(spi_test, sizeof(spi_test), "SPI Test %d: Sent=0x%02X, Received=0x%02X, Result=%d\r\n", 
-             i+1, test_data, received, spi_result);
-    HAL_UART_Transmit(&huart1, (uint8_t*)spi_test, strlen(spi_test), 1000);
-    HAL_Delay(200);  // Longer delay between tests
-  }
-  
-  // Run comprehensive RC522 diagnostics
-  RC522_Diagnostics();
-  
-  // If diagnostics show version register is still wrong, test different SPI settings
-  uint8_t version_check = RC522_ReadRegister(RC522_REG_VERSION);
-  if (version_check != 0x91 && version_check != 0x92 && version_check != 0xB2) {
-    const char* spi_test_msg = "Version still incorrect, testing SPI settings...\r\n";
-    HAL_UART_Transmit(&huart1, (uint8_t*)spi_test_msg, strlen(spi_test_msg), 1000);
-    RC522_TestSPISettings();
-  }
-  
-  // Final version check
-  uint8_t final_version = RC522_ReadRegister(RC522_REG_VERSION);
-  char final_result[80];
-  snprintf(final_result, sizeof(final_result), "FINAL RESULT: RC522 Version = 0x%02X\r\n", final_version);
-  HAL_UART_Transmit(&huart1, (uint8_t*)final_result, strlen(final_result), 1000);
-  
-  if (final_version == 0x91 || final_version == 0x92 || final_version == 0xB2) {
-    const char* success_msg = "*** RC522 WORKING! Ready for card scanning ***\r\n";
-    HAL_UART_Transmit(&huart1, (uint8_t*)success_msg, strlen(success_msg), 1000);
-    
-    // Test card detection immediately
-    const char* test_card_msg = "Initializing card detection...\r\n";
-    HAL_UART_Transmit(&huart1, (uint8_t*)test_card_msg, strlen(test_card_msg), 1000);
-    
-    // Try to initialize RC522 properly for card detection
-    RC522_Init();
-    HAL_Delay(100);
-    
-    const char* ready_msg = "RC522 ready! Please place an RFID card near the reader.\r\n";
-    HAL_UART_Transmit(&huart1, (uint8_t*)ready_msg, strlen(ready_msg), 1000);
-  } else {
-    const char* fail_msg = "*** RC522 FAILED! Check hardware and RST pin ***\r\n";
-    HAL_UART_Transmit(&huart1, (uint8_t*)fail_msg, strlen(fail_msg), 1000);
-  }
-  
-  // Debug_Printf("Direct UART1 test result: %d (0=OK)\r\n", uart_result);
-  // Debug_Printf("Please scan an RFID card...\r\n");
-  
-  // Optional: Run system test (uncomment for debugging)
-  // WARNING: Only enable ONE of these at a time!
-  // System_Test();
-  
-  // Optional: Run HX711 calibration (uncomment when calibrating)
-  // WARNING: This will interfere with normal operation!
-  // HX711_Calibrate();
-  
-  // NOTE: For production, make sure both test functions are commented out
-  // and ENABLE_DEBUG_UART is set to 0 in config.h
-  
-  /* USER CODE END 2 */
 
-  /* Infinite loop */
+  /* USER CODE BEGIN 2 */
+  System_Init();
+  SimpleProtocol_Init(); // This will start UART interrupt
+
   /* USER CODE BEGIN WHILE */
   while (1)
   {
     /* USER CODE END WHILE */
-
+    Process_RFID();
+    HAL_Delay(100);
     /* USER CODE BEGIN 3 */
-    
-    if (system_ready) {
-      uint32_t current_time = HAL_GetTick();
-      
-      // Debug: Periodic status removed to keep UART1 free for ESP32
-      
-      // Check for RFID cards periodically
-      if (current_time - last_card_check >= CARD_CHECK_INTERVAL_MS) {
-        // Debug messages disabled to keep UART1 free for ESP32 communication
-        // Use Debug_Printf for debug output if needed
-        
-        Process_RFID();
-        last_card_check = current_time;
-      }
-      
-      // Check weight periodically
-      if (current_time - last_weight_check >= WEIGHT_CHECK_INTERVAL_MS) {
-        Process_Weight();
-        last_weight_check = current_time;
-      }
-      
-      // Process any incoming ESP32 messages
-      SimpleProtocol_ProcessReceivedData();
-      
-      // Debug: Print registered cards every 30 seconds
-      static uint32_t last_debug_time = 0;
-      if (current_time - last_debug_time >= 30000) {
-        Debug_Printf("System running... Cards registered\r\n");
-        last_debug_time = current_time;
-      }
-      
-      // Watchdog refresh (if enabled)
-      // HAL_IWDG_Refresh(&hiwdg);
-      
-      // Small delay to prevent excessive CPU usage
-      HAL_Delay(10);
-    } else {
-      // System not ready, blink status LED if enabled
-#if ENABLE_STATUS_LEDS
-      static uint32_t blink_time = 0;
-      if (HAL_GetTick() - blink_time > 500) {
-        static uint8_t blink_state = 0;
-        Status_LED_Control(2, blink_state);
-        blink_state = !blink_state;
-        blink_time = HAL_GetTick();
-      }
-#endif
-      HAL_Delay(100);
-    }
-    
   }
   /* USER CODE END 3 */
 }
@@ -611,7 +468,7 @@ void SystemClock_Config(void)
   /** Configure the main internal regulator output voltage
   */
   __HAL_RCC_PWR_CLK_ENABLE();
-  __HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE3);
+  __HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE1);
 
   /** Initializes the RCC Oscillators according to the specified parameters
   * in the RCC_OscInitTypeDef structure.
@@ -622,10 +479,17 @@ void SystemClock_Config(void)
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
   RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSI;
   RCC_OscInitStruct.PLL.PLLM = 8;
-  RCC_OscInitStruct.PLL.PLLN = 84;
+  RCC_OscInitStruct.PLL.PLLN = 180;
   RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV2;
   RCC_OscInitStruct.PLL.PLLQ = 4;
   if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
+  {
+    Error_Handler();
+  }
+
+  /** Activate the Over-Drive mode
+  */
+  if (HAL_PWREx_EnableOverDrive() != HAL_OK)
   {
     Error_Handler();
   }
@@ -636,10 +500,10 @@ void SystemClock_Config(void)
                               |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
   RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
   RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
-  RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV2;
-  RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
+  RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV4;
+  RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV2;
 
-  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_2) != HAL_OK)
+  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_5) != HAL_OK)
   {
     Error_Handler();
   }
@@ -795,7 +659,7 @@ static void MX_GPIO_Init(void)
   HAL_GPIO_WritePin(GPIOC, HC_TRIG_Pin|ILI9341_CS_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOB, RC522_CS_Pin|RC522_RST_Pin|ILI9341_DC_Pin|ILI9341_RESET_Pin|HX711_SCK_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOB, RC522_CS_Pin|ILI9341_DC_Pin|ILI9341_RESET_Pin|HX711_SCK_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pins : HC_TRIG_Pin ILI9341_CS_Pin */
   GPIO_InitStruct.Pin = HC_TRIG_Pin|ILI9341_CS_Pin;
@@ -810,8 +674,8 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(HC_ECHO_GPIO_Port, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : RC522_CS_Pin RC522_RST_Pin ILI9341_DC_Pin ILI9341_RESET_Pin HX711_SCK_Pin */
-  GPIO_InitStruct.Pin = RC522_CS_Pin|RC522_RST_Pin|ILI9341_DC_Pin|ILI9341_RESET_Pin|HX711_SCK_Pin;
+  /*Configure GPIO pins : RC522_CS_Pin ILI9341_DC_Pin ILI9341_RESET_Pin HX711_SCK_Pin */
+  GPIO_InitStruct.Pin = RC522_CS_Pin|ILI9341_DC_Pin|ILI9341_RESET_Pin|HX711_SCK_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
@@ -829,7 +693,11 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
-
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
+    if (huart->Instance == USART1) {
+        SimpleProtocol_UART_RxCpltCallback();
+    }
+}
 /* USER CODE END 4 */
 
 /**
@@ -842,36 +710,6 @@ void Error_Handler(void)
   /* User can add his own implementation to report the HAL error return state */
   System_Error_Handler(__FILE__, __LINE__, __FUNCTION__);
   /* USER CODE END Error_Handler_Debug */
-}
-
-/**
- * @brief System error handler with detailed reporting
- */
-void System_Error_Handler(const char* file, int line, const char* function) {
-    Debug_Printf("SYSTEM ERROR!\r\n");
-    Debug_Printf("File: %s\r\n", file);
-    Debug_Printf("Line: %d\r\n", line);
-    Debug_Printf("Function: %s\r\n", function);
-    
-#if ENABLE_STATUS_LEDS
-    // Flash all LEDs to indicate error
-    for (int i = 0; i < 10; i++) {
-        Status_LED_Control(0, 1);
-        Status_LED_Control(1, 1);
-        Status_LED_Control(2, 1);
-        HAL_Delay(100);
-        Status_LED_Control(0, 0);
-        Status_LED_Control(1, 0);
-        Status_LED_Control(2, 0);
-        HAL_Delay(100);
-    }
-#endif
-    
-    // Disable interrupts and enter infinite loop
-    __disable_irq();
-    while(1) {
-        // Wait for watchdog reset or manual reset
-    }
 }
 
 #ifdef  USE_FULL_ASSERT

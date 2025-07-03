@@ -738,3 +738,187 @@
 2025-07-02 16:38:30,591 [INFO] WebApp:191 - Connection restablished
 2025-07-02 16:38:32,601 [INFO] WebApp:194 - Connection lost
 2025-07-02 16:38:32,740 [INFO] WebApp:191 - Connection restablished
+2025-07-02 17:00:07,622 [INFO] WebApp:194 - Connection lost
+2025-07-02 17:01:28,400 [INFO] WebApp:191 - Connection restablished
+2025-07-02 17:01:30,635 [INFO] WebApp:194 - Connection lost
+2025-07-02 17:01:30,753 [INFO] WebApp:191 - Connection restablished
+2025-07-02 17:08:42,808 [INFO] WebApp:194 - Connection lost
+2025-07-02 17:09:33,205 [INFO] WebApp:191 - Connection restablished
+2025-07-02 17:09:35,126 [INFO] WebApp:194 - Connection lost
+2025-07-02 17:09:35,249 [INFO] WebApp:191 - Connection restablished
+2025-07-02 17:11:53,457 [INFO] WebApp:194 - Connection lost
+2025-07-02 17:13:05,088 [INFO] WebApp:191 - Connection restablished
+2025-07-02 17:13:07,113 [INFO] WebApp:194 - Connection lost
+2025-07-02 17:13:07,229 [INFO] WebApp:191 - Connection restablished
+2025-07-02 17:21:00,453 [INFO] WebApp:194 - Connection lost
+2025-07-02 17:22:01,074 [INFO] WebApp:191 - Connection restablished
+2025-07-02 17:22:03,122 [INFO] WebApp:194 - Connection lost
+2025-07-02 17:22:03,263 [INFO] WebApp:191 - Connection restablished
+2025-07-02 17:24:12,716 [INFO] WebApp:194 - Connection lost
+2025-07-02 17:24:59,061 [INFO] WebApp:191 - Connection restablished
+2025-07-02 17:25:01,104 [INFO] WebApp:194 - Connection lost
+2025-07-02 17:25:01,257 [INFO] WebApp:191 - Connection restablished
+2025-07-02 17:28:44,520 [INFO] NvicIntPanel:101 - NVIC parent = com.st.microxplorer.plugins.ip.nvic.MultiNvicIntPanel[,0,0,469x169,layout=javax.swing.BoxLayout,alignmentX=0.0,alignmentY=0.0,border=,flags=9,maximumSize=,minimumSize=,preferredSize=]
+2025-07-02 17:28:45,572 [INFO] NvicIntPanel:101 - NVIC parent = com.st.microxplorer.plugins.ip.nvic.MultiNvicIntPanel[,0,0,0x0,invalid,layout=javax.swing.BoxLayout,alignmentX=0.0,alignmentY=0.0,border=,flags=9,maximumSize=,minimumSize=,preferredSize=]
+2025-07-02 17:28:47,045 [INFO] UtilMem:75 - End SaveConfig() Used Memory: 607438400 Bytes (930086912)
+2025-07-02 17:28:48,235 [INFO] UtilMem:75 - End SaveConfig() Used Memory: 652004928 Bytes (930086912)
+2025-07-02 17:28:49,484 [INFO] UtilMem:75 - End SaveConfig() Used Memory: 693947968 Bytes (930086912)
+2025-07-02 17:28:49,685 [INFO] BlockDiagram:2775 - set Specific Code input for plugin: SPI
+2025-07-02 17:28:49,686 [INFO] BlockDiagram:2775 - set Specific Code input for plugin: TIM1_8
+2025-07-02 17:28:49,686 [INFO] BlockDiagram:2775 - set Specific Code input for plugin: SYS
+2025-07-02 17:28:49,686 [INFO] BlockDiagram:2775 - set Specific Code input for plugin: RCC
+2025-07-02 17:28:49,686 [INFO] BlockDiagram:2775 - set Specific Code input for plugin: NVIC
+2025-07-02 17:28:49,686 [INFO] BlockDiagram:2775 - set Specific Code input for plugin: USART
+2025-07-02 17:28:49,688 [INFO] BlockDiagram:2775 - set Specific Code input for plugin: GPIO
+2025-07-02 17:28:49,690 [INFO] CodeGenerator:882 - code generatio: config db path: C:\ST\STM32CubeIDE_1.17.0\STM32CubeIDE\plugins\com.st.stm32cube.common.mx_6.14.1.202504091515\\db\
+2025-07-02 17:28:49,800 [INFO] CodeEngine:263 - oldGeneratedFile, D:\Nhung\Health_care\STM32\health_care\MXTmpFiles\license.tmp_save
+2025-07-02 17:28:50,134 [INFO] CodeEngine:287 - Generated code: D:\Nhung\Health_care\STM32\health_care\MXTmpFiles\license.tmp
+2025-07-02 17:28:50,174 [INFO] CodeEngine:263 - oldGeneratedFile, D:\Nhung\Health_care\STM32\health_care\MXTmpFiles\gpio.tmp_save
+2025-07-02 17:28:50,337 [INFO] CodeEngine:287 - Generated code: D:\Nhung\Health_care\STM32\health_care\MXTmpFiles\gpio.tmp
+2025-07-02 17:28:50,478 [INFO] CodeEngine:263 - oldGeneratedFile, D:\Nhung\Health_care\STM32\health_care\Core\Src\stm32f4xx_it.c_save
+2025-07-02 17:28:50,755 [INFO] CodeEngine:287 - Generated code: D:\Nhung\Health_care\STM32\health_care\Core\Src\stm32f4xx_it.c
+2025-07-02 17:28:50,761 [INFO] CodeEngine:263 - oldGeneratedFile, D:\Nhung\Health_care\STM32\health_care\Core\Inc\stm32f4xx_it.h_save
+2025-07-02 17:28:50,835 [INFO] CodeEngine:287 - Generated code: D:\Nhung\Health_care\STM32\health_care\Core\Inc\stm32f4xx_it.h
+2025-07-02 17:28:50,860 [INFO] CodeEngine:263 - oldGeneratedFile, D:\Nhung\Health_care\STM32\health_care\Core\Src\stm32f4xx_hal_msp.c_save
+2025-07-02 17:28:51,003 [INFO] CodeEngine:287 - Generated code: D:\Nhung\Health_care\STM32\health_care\Core\Src\stm32f4xx_hal_msp.c
+2025-07-02 17:28:51,009 [INFO] CodeEngine:263 - oldGeneratedFile, D:\Nhung\Health_care\STM32\health_care\MXTmpFiles\system.tmp_save
+2025-07-02 17:28:51,068 [INFO] CodeEngine:287 - Generated code: D:\Nhung\Health_care\STM32\health_care\MXTmpFiles\system.tmp
+2025-07-02 17:28:51,083 [INFO] CodeEngine:319 - oldGeneratedFile, D:\Nhung\Health_care\STM32\health_care\Core\Inc\stm32f4xx_hal_conf.h_save
+2025-07-02 17:28:51,160 [INFO] CodeEngine:343 - Generated code: D:\Nhung\Health_care\STM32\health_care\Core\Inc\stm32f4xx_hal_conf.h
+2025-07-02 17:28:51,176 [WARN] IPConfigManager:3790 - IP not found : TIM
+2025-07-02 17:28:51,177 [WARN] CodeGenerator:4198 - IP not found : null
+2025-07-02 17:28:51,186 [INFO] CodeEngine:263 - oldGeneratedFile, D:\Nhung\Health_care\STM32\health_care\Core\Inc\main.h_save
+2025-07-02 17:28:51,281 [INFO] CodeEngine:287 - Generated code: D:\Nhung\Health_care\STM32\health_care\Core\Inc\main.h
+2025-07-02 17:28:51,290 [INFO] CodeEngine:263 - oldGeneratedFile, D:\Nhung\Health_care\STM32\health_care\Core\Src\main.c_save
+2025-07-02 17:28:51,431 [INFO] CodeEngine:287 - Generated code: D:\Nhung\Health_care\STM32\health_care\Core\Src\main.c
+2025-07-02 17:28:52,034 [INFO] ProjectBuilder:3324 - Time for Copy HAL[1] : 241mS.
+2025-07-02 17:28:52,037 [INFO] ProjectBuilder:4912 - Project Generator version: 4.6.0.1-B1
+2025-07-02 17:28:52,129 [INFO] ConfigFileManager:1590 - The Die is : DIE419
+2025-07-02 17:28:53,038 [INFO] ProjectBuilder:5191 - Time for Generating toolchain IDE Files: 1000mS.
+2025-07-02 17:28:53,039 [INFO] ProjectBuilder:3181 - Time for Copy CMSIS : 1mS.
+2025-07-02 17:28:53,040 [INFO] ProjectBuilder:3181 - Time for Copy CMSIS : 0mS.
+2025-07-02 17:29:56,304 [INFO] NvicIntPanel:101 - NVIC parent = com.st.microxplorer.plugins.ip.nvic.MultiNvicIntPanel[,0,0,0x0,invalid,layout=javax.swing.BoxLayout,alignmentX=0.0,alignmentY=0.0,border=,flags=9,maximumSize=,minimumSize=,preferredSize=]
+2025-07-02 17:30:01,167 [INFO] NvicIntPanel:101 - NVIC parent = com.st.microxplorer.plugins.ip.nvic.MultiNvicIntPanel[,0,0,0x0,invalid,layout=javax.swing.BoxLayout,alignmentX=0.0,alignmentY=0.0,border=,flags=9,maximumSize=,minimumSize=,preferredSize=]
+2025-07-02 17:30:03,265 [INFO] NvicIntPanel:101 - NVIC parent = com.st.microxplorer.plugins.ip.nvic.MultiNvicIntPanel[,0,0,0x0,invalid,layout=javax.swing.BoxLayout,alignmentX=0.0,alignmentY=0.0,border=,flags=9,maximumSize=,minimumSize=,preferredSize=]
+2025-07-02 17:30:07,711 [INFO] UtilMem:75 - End SaveConfig() Used Memory: 549935920 Bytes (930086912)
+2025-07-02 17:30:09,023 [INFO] UtilMem:75 - End SaveConfig() Used Memory: 579822384 Bytes (930086912)
+2025-07-02 17:30:10,164 [INFO] UtilMem:75 - End SaveConfig() Used Memory: 626481968 Bytes (930086912)
+2025-07-02 17:30:10,297 [INFO] BlockDiagram:2775 - set Specific Code input for plugin: SPI
+2025-07-02 17:30:10,297 [INFO] BlockDiagram:2775 - set Specific Code input for plugin: TIM1_8
+2025-07-02 17:30:10,297 [INFO] BlockDiagram:2775 - set Specific Code input for plugin: SYS
+2025-07-02 17:30:10,297 [INFO] BlockDiagram:2775 - set Specific Code input for plugin: RCC
+2025-07-02 17:30:10,297 [INFO] BlockDiagram:2775 - set Specific Code input for plugin: NVIC
+2025-07-02 17:30:10,297 [INFO] BlockDiagram:2775 - set Specific Code input for plugin: USART
+2025-07-02 17:30:10,298 [INFO] BlockDiagram:2775 - set Specific Code input for plugin: GPIO
+2025-07-02 17:30:10,299 [INFO] CodeGenerator:882 - code generatio: config db path: C:\ST\STM32CubeIDE_1.17.0\STM32CubeIDE\plugins\com.st.stm32cube.common.mx_6.14.1.202504091515\\db\
+2025-07-02 17:30:10,373 [INFO] CodeEngine:263 - oldGeneratedFile, D:\Nhung\Health_care\STM32\health_care\MXTmpFiles\license.tmp_save
+2025-07-02 17:30:10,433 [INFO] CodeEngine:287 - Generated code: D:\Nhung\Health_care\STM32\health_care\MXTmpFiles\license.tmp
+2025-07-02 17:30:10,456 [INFO] CodeEngine:263 - oldGeneratedFile, D:\Nhung\Health_care\STM32\health_care\MXTmpFiles\gpio.tmp_save
+2025-07-02 17:30:10,527 [INFO] CodeEngine:287 - Generated code: D:\Nhung\Health_care\STM32\health_care\MXTmpFiles\gpio.tmp
+2025-07-02 17:30:10,617 [INFO] CodeEngine:263 - oldGeneratedFile, D:\Nhung\Health_care\STM32\health_care\Core\Src\stm32f4xx_it.c_save
+2025-07-02 17:30:10,710 [INFO] CodeEngine:287 - Generated code: D:\Nhung\Health_care\STM32\health_care\Core\Src\stm32f4xx_it.c
+2025-07-02 17:30:10,715 [INFO] CodeEngine:263 - oldGeneratedFile, D:\Nhung\Health_care\STM32\health_care\Core\Inc\stm32f4xx_it.h_save
+2025-07-02 17:30:10,767 [INFO] CodeEngine:287 - Generated code: D:\Nhung\Health_care\STM32\health_care\Core\Inc\stm32f4xx_it.h
+2025-07-02 17:30:10,784 [INFO] CodeEngine:263 - oldGeneratedFile, D:\Nhung\Health_care\STM32\health_care\Core\Src\stm32f4xx_hal_msp.c_save
+2025-07-02 17:30:10,881 [INFO] CodeEngine:287 - Generated code: D:\Nhung\Health_care\STM32\health_care\Core\Src\stm32f4xx_hal_msp.c
+2025-07-02 17:30:10,884 [INFO] CodeEngine:263 - oldGeneratedFile, D:\Nhung\Health_care\STM32\health_care\MXTmpFiles\system.tmp_save
+2025-07-02 17:30:10,952 [INFO] CodeEngine:287 - Generated code: D:\Nhung\Health_care\STM32\health_care\MXTmpFiles\system.tmp
+2025-07-02 17:30:10,964 [INFO] CodeEngine:319 - oldGeneratedFile, D:\Nhung\Health_care\STM32\health_care\Core\Inc\stm32f4xx_hal_conf.h_save
+2025-07-02 17:30:11,047 [INFO] CodeEngine:343 - Generated code: D:\Nhung\Health_care\STM32\health_care\Core\Inc\stm32f4xx_hal_conf.h
+2025-07-02 17:30:11,061 [WARN] IPConfigManager:3790 - IP not found : TIM
+2025-07-02 17:30:11,062 [WARN] CodeGenerator:4198 - IP not found : null
+2025-07-02 17:30:11,067 [INFO] CodeEngine:263 - oldGeneratedFile, D:\Nhung\Health_care\STM32\health_care\Core\Inc\main.h_save
+2025-07-02 17:30:11,127 [INFO] CodeEngine:287 - Generated code: D:\Nhung\Health_care\STM32\health_care\Core\Inc\main.h
+2025-07-02 17:30:11,130 [INFO] CodeEngine:263 - oldGeneratedFile, D:\Nhung\Health_care\STM32\health_care\Core\Src\main.c_save
+2025-07-02 17:30:11,256 [INFO] CodeEngine:287 - Generated code: D:\Nhung\Health_care\STM32\health_care\Core\Src\main.c
+2025-07-02 17:30:11,689 [INFO] ProjectBuilder:3324 - Time for Copy HAL[1] : 128mS.
+2025-07-02 17:30:11,692 [INFO] ProjectBuilder:4912 - Project Generator version: 4.6.0.1-B1
+2025-07-02 17:30:11,779 [INFO] ConfigFileManager:1590 - The Die is : DIE419
+2025-07-02 17:30:12,530 [INFO] ProjectBuilder:5191 - Time for Generating toolchain IDE Files: 837mS.
+2025-07-02 17:30:12,531 [INFO] ProjectBuilder:3181 - Time for Copy CMSIS : 1mS.
+2025-07-02 17:30:12,533 [INFO] ProjectBuilder:3181 - Time for Copy CMSIS : 0mS.
+2025-07-02 17:31:43,098 [INFO] NvicIntPanel:101 - NVIC parent = com.st.microxplorer.plugins.ip.nvic.MultiNvicIntPanel[,0,0,0x0,invalid,layout=javax.swing.BoxLayout,alignmentX=0.0,alignmentY=0.0,border=,flags=9,maximumSize=,minimumSize=,preferredSize=]
+2025-07-02 17:32:42,172 [INFO] NvicIntPanel:101 - NVIC parent = com.st.microxplorer.plugins.ip.nvic.MultiNvicIntPanel[,0,0,0x0,invalid,layout=javax.swing.BoxLayout,alignmentX=0.0,alignmentY=0.0,border=,flags=9,maximumSize=,minimumSize=,preferredSize=]
+2025-07-02 17:32:42,255 [INFO] NvicIntPanel:101 - NVIC parent = com.st.microxplorer.plugins.ip.nvic.MultiNvicIntPanel[,0,0,0x0,invalid,layout=javax.swing.BoxLayout,alignmentX=0.0,alignmentY=0.0,border=,flags=9,maximumSize=,minimumSize=,preferredSize=]
+2025-07-02 17:33:00,044 [INFO] UtilMem:75 - End SaveConfig() Used Memory: 312111880 Bytes (930086912)
+2025-07-02 17:33:01,521 [INFO] UtilMem:75 - End SaveConfig() Used Memory: 339897096 Bytes (930086912)
+2025-07-02 17:33:02,519 [INFO] UtilMem:75 - End SaveConfig() Used Memory: 385512200 Bytes (930086912)
+2025-07-02 17:33:02,698 [INFO] BlockDiagram:2775 - set Specific Code input for plugin: SPI
+2025-07-02 17:33:02,698 [INFO] BlockDiagram:2775 - set Specific Code input for plugin: TIM1_8
+2025-07-02 17:33:02,698 [INFO] BlockDiagram:2775 - set Specific Code input for plugin: SYS
+2025-07-02 17:33:02,698 [INFO] BlockDiagram:2775 - set Specific Code input for plugin: RCC
+2025-07-02 17:33:02,698 [INFO] BlockDiagram:2775 - set Specific Code input for plugin: NVIC
+2025-07-02 17:33:02,698 [INFO] BlockDiagram:2775 - set Specific Code input for plugin: USART
+2025-07-02 17:33:02,699 [INFO] BlockDiagram:2775 - set Specific Code input for plugin: GPIO
+2025-07-02 17:33:02,700 [INFO] CodeGenerator:882 - code generatio: config db path: C:\ST\STM32CubeIDE_1.17.0\STM32CubeIDE\plugins\com.st.stm32cube.common.mx_6.14.1.202504091515\\db\
+2025-07-02 17:33:02,840 [INFO] CodeEngine:263 - oldGeneratedFile, D:\Nhung\Health_care\STM32\health_care\MXTmpFiles\license.tmp_save
+2025-07-02 17:33:02,906 [INFO] CodeEngine:287 - Generated code: D:\Nhung\Health_care\STM32\health_care\MXTmpFiles\license.tmp
+2025-07-02 17:33:02,921 [INFO] CodeEngine:263 - oldGeneratedFile, D:\Nhung\Health_care\STM32\health_care\MXTmpFiles\gpio.tmp_save
+2025-07-02 17:33:02,970 [INFO] CodeEngine:287 - Generated code: D:\Nhung\Health_care\STM32\health_care\MXTmpFiles\gpio.tmp
+2025-07-02 17:33:03,042 [INFO] CodeEngine:263 - oldGeneratedFile, D:\Nhung\Health_care\STM32\health_care\Core\Src\stm32f4xx_it.c_save
+2025-07-02 17:33:03,104 [INFO] CodeEngine:287 - Generated code: D:\Nhung\Health_care\STM32\health_care\Core\Src\stm32f4xx_it.c
+2025-07-02 17:33:03,109 [INFO] CodeEngine:263 - oldGeneratedFile, D:\Nhung\Health_care\STM32\health_care\Core\Inc\stm32f4xx_it.h_save
+2025-07-02 17:33:03,161 [INFO] CodeEngine:287 - Generated code: D:\Nhung\Health_care\STM32\health_care\Core\Inc\stm32f4xx_it.h
+2025-07-02 17:33:03,176 [INFO] CodeEngine:263 - oldGeneratedFile, D:\Nhung\Health_care\STM32\health_care\Core\Src\stm32f4xx_hal_msp.c_save
+2025-07-02 17:33:03,265 [INFO] CodeEngine:287 - Generated code: D:\Nhung\Health_care\STM32\health_care\Core\Src\stm32f4xx_hal_msp.c
+2025-07-02 17:33:03,268 [INFO] CodeEngine:263 - oldGeneratedFile, D:\Nhung\Health_care\STM32\health_care\MXTmpFiles\system.tmp_save
+2025-07-02 17:33:03,321 [INFO] CodeEngine:287 - Generated code: D:\Nhung\Health_care\STM32\health_care\MXTmpFiles\system.tmp
+2025-07-02 17:33:03,328 [INFO] CodeEngine:319 - oldGeneratedFile, D:\Nhung\Health_care\STM32\health_care\Core\Inc\stm32f4xx_hal_conf.h_save
+2025-07-02 17:33:03,383 [INFO] CodeEngine:343 - Generated code: D:\Nhung\Health_care\STM32\health_care\Core\Inc\stm32f4xx_hal_conf.h
+2025-07-02 17:33:03,394 [WARN] IPConfigManager:3790 - IP not found : TIM
+2025-07-02 17:33:03,395 [WARN] CodeGenerator:4198 - IP not found : null
+2025-07-02 17:33:03,400 [INFO] CodeEngine:263 - oldGeneratedFile, D:\Nhung\Health_care\STM32\health_care\Core\Inc\main.h_save
+2025-07-02 17:33:03,456 [INFO] CodeEngine:287 - Generated code: D:\Nhung\Health_care\STM32\health_care\Core\Inc\main.h
+2025-07-02 17:33:03,460 [INFO] CodeEngine:263 - oldGeneratedFile, D:\Nhung\Health_care\STM32\health_care\Core\Src\main.c_save
+2025-07-02 17:33:03,553 [INFO] CodeEngine:287 - Generated code: D:\Nhung\Health_care\STM32\health_care\Core\Src\main.c
+2025-07-02 17:33:03,801 [INFO] ProjectBuilder:3324 - Time for Copy HAL[1] : 102mS.
+2025-07-02 17:33:03,805 [INFO] ProjectBuilder:4912 - Project Generator version: 4.6.0.1-B1
+2025-07-02 17:33:03,872 [INFO] ConfigFileManager:1590 - The Die is : DIE419
+2025-07-02 17:33:04,441 [INFO] ProjectBuilder:5191 - Time for Generating toolchain IDE Files: 635mS.
+2025-07-02 17:33:04,441 [INFO] ProjectBuilder:3181 - Time for Copy CMSIS : 0mS.
+2025-07-02 17:33:04,443 [INFO] ProjectBuilder:3181 - Time for Copy CMSIS : 1mS.
+2025-07-02 17:40:12,402 [INFO] NvicIntPanel:101 - NVIC parent = com.st.microxplorer.plugins.ip.nvic.MultiNvicIntPanel[,0,0,0x0,invalid,layout=javax.swing.BoxLayout,alignmentX=0.0,alignmentY=0.0,border=,flags=9,maximumSize=,minimumSize=,preferredSize=]
+2025-07-02 17:59:27,401 [INFO] WebApp:194 - Connection lost
+2025-07-02 18:00:50,024 [INFO] WebApp:191 - Connection restablished
+2025-07-02 18:00:52,121 [INFO] WebApp:194 - Connection lost
+2025-07-02 18:00:52,263 [INFO] WebApp:191 - Connection restablished
+2025-07-02 18:09:06,760 [INFO] NvicIntPanel:101 - NVIC parent = com.st.microxplorer.plugins.ip.nvic.MultiNvicIntPanel[,0,0,965x153,layout=javax.swing.BoxLayout,alignmentX=0.0,alignmentY=0.0,border=,flags=9,maximumSize=,minimumSize=,preferredSize=]
+2025-07-02 18:09:13,832 [INFO] NvicIntPanel:101 - NVIC parent = com.st.microxplorer.plugins.ip.nvic.MultiNvicIntPanel[,0,0,0x0,invalid,layout=javax.swing.BoxLayout,alignmentX=0.0,alignmentY=0.0,border=,flags=9,maximumSize=,minimumSize=,preferredSize=]
+2025-07-02 18:09:31,424 [INFO] UtilMem:75 - End SaveConfig() Used Memory: 502364832 Bytes (930086912)
+2025-07-02 18:09:32,718 [INFO] UtilMem:75 - End SaveConfig() Used Memory: 530676384 Bytes (930086912)
+2025-07-02 18:09:36,120 [INFO] UtilMem:75 - End SaveConfig() Used Memory: 577862304 Bytes (930086912)
+2025-07-02 18:09:36,288 [INFO] BlockDiagram:2775 - set Specific Code input for plugin: SPI
+2025-07-02 18:09:36,288 [INFO] BlockDiagram:2775 - set Specific Code input for plugin: TIM1_8
+2025-07-02 18:09:36,288 [INFO] BlockDiagram:2775 - set Specific Code input for plugin: SYS
+2025-07-02 18:09:36,288 [INFO] BlockDiagram:2775 - set Specific Code input for plugin: RCC
+2025-07-02 18:09:36,288 [INFO] BlockDiagram:2775 - set Specific Code input for plugin: NVIC
+2025-07-02 18:09:36,288 [INFO] BlockDiagram:2775 - set Specific Code input for plugin: USART
+2025-07-02 18:09:36,288 [INFO] BlockDiagram:2775 - set Specific Code input for plugin: GPIO
+2025-07-02 18:09:36,289 [INFO] CodeGenerator:882 - code generatio: config db path: C:\ST\STM32CubeIDE_1.17.0\STM32CubeIDE\plugins\com.st.stm32cube.common.mx_6.14.1.202504091515\\db\
+2025-07-02 18:09:36,443 [INFO] CodeEngine:263 - oldGeneratedFile, D:\Nhung\Health_care\STM32\health_care\MXTmpFiles\license.tmp_save
+2025-07-02 18:09:36,525 [INFO] CodeEngine:287 - Generated code: D:\Nhung\Health_care\STM32\health_care\MXTmpFiles\license.tmp
+2025-07-02 18:09:36,541 [INFO] CodeEngine:263 - oldGeneratedFile, D:\Nhung\Health_care\STM32\health_care\MXTmpFiles\gpio.tmp_save
+2025-07-02 18:09:36,601 [INFO] CodeEngine:287 - Generated code: D:\Nhung\Health_care\STM32\health_care\MXTmpFiles\gpio.tmp
+2025-07-02 18:09:36,665 [INFO] CodeEngine:263 - oldGeneratedFile, D:\Nhung\Health_care\STM32\health_care\Core\Src\stm32f4xx_it.c_save
+2025-07-02 18:09:36,788 [INFO] CodeEngine:287 - Generated code: D:\Nhung\Health_care\STM32\health_care\Core\Src\stm32f4xx_it.c
+2025-07-02 18:09:36,791 [INFO] CodeEngine:263 - oldGeneratedFile, D:\Nhung\Health_care\STM32\health_care\Core\Inc\stm32f4xx_it.h_save
+2025-07-02 18:09:36,838 [INFO] CodeEngine:287 - Generated code: D:\Nhung\Health_care\STM32\health_care\Core\Inc\stm32f4xx_it.h
+2025-07-02 18:09:36,851 [INFO] CodeEngine:263 - oldGeneratedFile, D:\Nhung\Health_care\STM32\health_care\Core\Src\stm32f4xx_hal_msp.c_save
+2025-07-02 18:09:36,930 [INFO] CodeEngine:287 - Generated code: D:\Nhung\Health_care\STM32\health_care\Core\Src\stm32f4xx_hal_msp.c
+2025-07-02 18:09:36,933 [INFO] CodeEngine:263 - oldGeneratedFile, D:\Nhung\Health_care\STM32\health_care\MXTmpFiles\system.tmp_save
+2025-07-02 18:09:36,977 [INFO] CodeEngine:287 - Generated code: D:\Nhung\Health_care\STM32\health_care\MXTmpFiles\system.tmp
+2025-07-02 18:09:36,984 [INFO] CodeEngine:319 - oldGeneratedFile, D:\Nhung\Health_care\STM32\health_care\Core\Inc\stm32f4xx_hal_conf.h_save
+2025-07-02 18:09:37,037 [INFO] CodeEngine:343 - Generated code: D:\Nhung\Health_care\STM32\health_care\Core\Inc\stm32f4xx_hal_conf.h
+2025-07-02 18:09:37,046 [WARN] IPConfigManager:3790 - IP not found : TIM
+2025-07-02 18:09:37,047 [WARN] CodeGenerator:4198 - IP not found : null
+2025-07-02 18:09:37,052 [INFO] CodeEngine:263 - oldGeneratedFile, D:\Nhung\Health_care\STM32\health_care\Core\Inc\main.h_save
+2025-07-02 18:09:37,122 [INFO] CodeEngine:287 - Generated code: D:\Nhung\Health_care\STM32\health_care\Core\Inc\main.h
+2025-07-02 18:09:37,125 [INFO] CodeEngine:263 - oldGeneratedFile, D:\Nhung\Health_care\STM32\health_care\Core\Src\main.c_save
+2025-07-02 18:09:37,219 [INFO] CodeEngine:287 - Generated code: D:\Nhung\Health_care\STM32\health_care\Core\Src\main.c
+2025-07-02 18:09:37,494 [INFO] ProjectBuilder:3324 - Time for Copy HAL[1] : 122mS.
+2025-07-02 18:09:37,496 [INFO] ProjectBuilder:4912 - Project Generator version: 4.6.0.1-B1
+2025-07-02 18:09:37,571 [INFO] ConfigFileManager:1590 - The Die is : DIE419
+2025-07-02 18:09:38,236 [INFO] ProjectBuilder:5191 - Time for Generating toolchain IDE Files: 740mS.
+2025-07-02 18:09:38,236 [INFO] ProjectBuilder:3181 - Time for Copy CMSIS : 0mS.
+2025-07-02 18:09:38,238 [INFO] ProjectBuilder:3181 - Time for Copy CMSIS : 0mS.
+2025-07-02 18:22:12,215 [ERROR] LogOutputStream:75 - [STDERR_REDIRECT] 
