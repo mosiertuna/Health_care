@@ -1,6 +1,11 @@
 /*
  * Healthcare RFID System - ESP32 Communication Module
- * STM32-ESP32 RFID/Weight System Communication & Web Interface
+ * 
+ * CHỨC NĂNG CHÍNH:
+ * - ESP32 CHỈ NHẬN dữ liệu từ STM32 (mã thẻ + cân nặng)
+ * - Không gửi phản hồi về STM32
+ * - Lưu trữ và hiển thị dữ liệu qua web interface
+ * - Quản lý danh sách thẻ hợp lệ
  */
 
 #include <WiFi.h>
@@ -22,12 +27,8 @@ bool useStationMode = false;
 #define MSG_START_BYTE      0xAA
 #define MSG_END_BYTE        0x55
 
-// Message types - Updated for new protocol
-#define MSG_TYPE_CARD_DETECTED      0x01  // STM32 -> ESP32: Any card detected with weight
-#define MSG_TYPE_SYSTEM_READY       0x02  // STM32 -> ESP32: System startup
-#define MSG_TYPE_ACK                0x05  // STM32 -> ESP32: Acknowledgment
-#define MSG_TYPE_SYSTEM_RESET       0x07  // ESP32 -> STM32: Reset command
-#define MSG_TYPE_CONFIG_UPDATE      0x08  // ESP32 -> STM32: Config update
+// Message types - Chỉ cần loại này
+#define MSG_TYPE_CARD_DETECTED      0x01  // STM32 -> ESP32: Card detected with weight
 
 // Legacy constants removed
 #define UID_SIZE           4
@@ -57,7 +58,7 @@ uint8_t validCardCount = 0;
 struct CardReading {
     uint8_t uid[UID_SIZE];
     bool isValid;
-    float weight;
+    int32_t weight; // Đổi thành int32_t
     unsigned long timestamp;
     bool hasData;
 } latestReading = {0};
@@ -66,7 +67,7 @@ struct CardReading {
 #define MAX_WEIGHT_HISTORY 20
 struct WeightRecord {
     uint8_t uid[UID_SIZE];
-    float weight;
+    int32_t weight; // Đổi thành int32_t
     unsigned long timestamp;
     bool valid;
     bool isValidCard;
@@ -90,16 +91,14 @@ bool removeValidCard(uint8_t* uid);
 bool isCardValid(uint8_t* uid);
 void processSTM32Message();
 void processCompleteMessage(uint8_t msgType);
-void processCardDetected(uint8_t* uid, float weight);
-void sendSystemResetToSTM32();
-void sendConfigUpdateToSTM32();
+void processCardDetected(uint8_t* uid, int32_t weight);
 String uidToString(uint8_t* uid);
 void stringToUID(String uidStr, uint8_t* uid);
 bool isValidUID(String uidStr);
-void addWeightRecord(uint8_t* uid, float weight, unsigned long timestamp, bool isValid);
+void addWeightRecord(uint8_t* uid, int32_t weight, unsigned long timestamp, bool isValid);
 String getWeightHistoryForCard(uint8_t* uid);
-void sendHTMLResponse(String html);  // Helper function for UTF-8 HTML responses
-String formatUptime(unsigned long milliseconds);  // Helper function to format uptime
+void sendHTMLResponse(String html);
+String formatUptime(unsigned long milliseconds);
 
 // Web Interface Functions
 String getMainPage();
@@ -110,7 +109,6 @@ void handleCards();
 void handleCardManagementPage();
 void handleAddCard();
 void handleRemoveCard();
-void handleRefresh();
 void handleWeightHistory();
 
 void setup() {
@@ -121,9 +119,10 @@ void setup() {
     // Initialize EEPROM
     EEPROM.begin(EEPROM_SIZE);
     
-    // Initialize STM32 Serial communication - GPIO4(RX), GPIO2(TX)
-    stm32Serial.begin(STM32_SERIAL_BAUD, SERIAL_8N1, 4, 2);
-    
+    // Initialize STM32 Serial communication - GPIO16(RX), GPIO17(TX)
+    stm32Serial.begin(STM32_SERIAL_BAUD, SERIAL_8N1, 16, 17);
+    // Set STM32 Serial to listen for incoming messages
+    stm32Serial.setTimeout(100);
     // Load valid cards from EEPROM
     loadValidCardsFromEEPROM();
     
@@ -137,7 +136,6 @@ void setup() {
     server.on("/manage", HTTP_GET, handleCardManagementPage);
     server.on("/add_card", HTTP_POST, handleAddCard);
     server.on("/remove_card", HTTP_POST, handleRemoveCard);
-    server.on("/refresh", HTTP_POST, handleRefresh);
     server.on("/weight_history", HTTP_GET, handleWeightHistory);
     
     // Start web server
@@ -149,8 +147,17 @@ void setup() {
 
 void loop() {
     server.handleClient();
+    if (stm32Serial.available()) {
+        Serial.println("Data available on UART!");
+    } else {
+        static unsigned long lastCheck = 0;
+        if (millis() - lastCheck > 1000) {
+            Serial.println("No data on UART");
+            lastCheck = millis();
+        }
+    }
     processSTM32Message();
-    delay(1); // Giảm delay từ 10ms xuống 1ms để phản hồi nhanh hơn
+    delay(1);
 }
 
 void setupWiFi() {
@@ -246,22 +253,11 @@ bool isCardValid(uint8_t* uid) {
 }
 
 void processSTM32Message() {
-    // Thêm debug để theo dõi UART
-    static unsigned long lastDebugTime = 0;
-    if (millis() - lastDebugTime > 5000) { // Debug mỗi 5 giây
-        if (stm32Serial.available() > 0) {
-            Serial.printf("UART buffer has %d bytes\n", stm32Serial.available());
-        }
-        lastDebugTime = millis();
-    }
-    
     while (stm32Serial.available() && rxIndex < UART_BUFFER_SIZE) {
         uint8_t receivedByte = stm32Serial.read();
         
         // Debug raw bytes
         Serial.printf("RX[%d]: 0x%02X\n", rxIndex, receivedByte);
-        
-        rxBuffer[rxIndex] = receivedByte;
         
         // Check for start byte
         if (rxIndex == 0) {
@@ -270,48 +266,36 @@ void processSTM32Message() {
                 continue; // Wait for start byte
             }
             Serial.println("Start byte found!");
+            rxBuffer[rxIndex] = receivedByte;
+            rxIndex++;
+            continue;
         }
         
+        // Store received byte
+        rxBuffer[rxIndex] = receivedByte;
         rxIndex++;
         
-        // Check if we have enough bytes to determine message type
+        // Check if we have message type (chỉ xử lý MSG_TYPE_CARD_DETECTED)
         if (rxIndex >= 2) {
             uint8_t msgType = rxBuffer[1];
-            uint8_t expectedLength = 0;
-            bool messageComplete = false;
             
-            switch (msgType) {
-                case MSG_TYPE_CARD_DETECTED:
-                    expectedLength = 11; // AA 01 UID[4] WEIGHT[4] 55
-                    break;
-                case MSG_TYPE_SYSTEM_READY:
-                    expectedLength = 3;  // AA 02 55
-                    break;
-                case MSG_TYPE_ACK:
-                    expectedLength = 4;  // AA 05 TYPE 55
-                    break;
-                default:
-                    Serial.printf("Unknown message type: 0x%02X, resetting\n", msgType);
-                    rxIndex = 0;
-                    continue;
-            }
-            
-            // Check if message is complete
-            if (rxIndex >= expectedLength) {
-                if (rxBuffer[expectedLength - 1] == MSG_END_BYTE) {
-                    messageComplete = true;
-                    Serial.printf("Complete message received, type: 0x%02X, length: %d\n", msgType, expectedLength);
-                } else {
-                    Serial.printf("Invalid end byte: 0x%02X, expected: 0x%02X\n", rxBuffer[expectedLength - 1], MSG_END_BYTE);
-                    rxIndex = 0;
-                    continue;
+            // Chỉ xử lý tin nhắn phát hiện thẻ
+            if (msgType == MSG_TYPE_CARD_DETECTED) {
+                // Cần 11 bytes: AA 01 UID[4] WEIGHT[4] 55
+                if (rxIndex >= 11) {
+                    if (rxBuffer[10] == MSG_END_BYTE) {
+                        // Message hoàn chỉnh - xử lý
+                        Serial.printf("Complete message received, type: 0x%02X, length: 11\n", msgType);
+                        processCompleteMessage(msgType);
+                    } else {
+                        Serial.printf("Invalid end byte: 0x%02X, expected: 0x%02X\n", rxBuffer[10], MSG_END_BYTE);
+                    }
+                    rxIndex = 0; // Reset buffer
                 }
-            }
-            
-            if (messageComplete) {
-                processCompleteMessage(msgType);
+            } else {
+                // Bỏ qua các loại message khác
+                Serial.printf("Ignoring message type: 0x%02X\n", msgType);
                 rxIndex = 0;
-                continue;
             }
         }
         
@@ -322,12 +306,12 @@ void processSTM32Message() {
         }
     }
     
-    // Reset if buffer has been stuck for too long
+    // Reset buffer nếu stuck quá lâu
     static unsigned long bufferStartTime = 0;
     if (rxIndex > 0) {
         if (bufferStartTime == 0) {
             bufferStartTime = millis();
-        } else if (millis() - bufferStartTime > 500) { // 500ms timeout
+        } else if (millis() - bufferStartTime > 1000) { // 1s timeout
             Serial.printf("Buffer timeout, resetting. Had %d bytes\n", rxIndex);
             rxIndex = 0;
             bufferStartTime = 0;
@@ -338,79 +322,49 @@ void processSTM32Message() {
 }
 
 void processCompleteMessage(uint8_t msgType) {
-    switch (msgType) {
-        case MSG_TYPE_CARD_DETECTED: {
-            // Extract UID and weight from message: AA 01 UID[4] WEIGHT[4] 55
-            uint8_t uid[UID_SIZE];
-            float weight;
-            
-            memcpy(uid, &rxBuffer[2], UID_SIZE);
-            memcpy(&weight, &rxBuffer[6], sizeof(float));
-            
-            processCardDetected(uid, weight);
-            break;
-        }
-        
-        case MSG_TYPE_SYSTEM_READY: {
-            Serial.println("STM32 System Ready");
-            // Optionally send configuration or do initial setup
-            break;
-        }
-        
-        case MSG_TYPE_ACK: {
-            uint8_t ackedType = rxBuffer[2];
-            Serial.printf("STM32 ACK for message type: 0x%02X\n", ackedType);
-            break;
-        }
-        
-        default:
-            Serial.printf("Unknown message type: 0x%02X\n", msgType);
-            break;
+    if (msgType == MSG_TYPE_CARD_DETECTED) {
+        // Extract UID and weight from message: AA 01 UID[4] WEIGHT[4] 55
+        uint8_t uid[UID_SIZE];
+        int32_t weight;
+
+        // Sao chép UID
+        memcpy(uid, &rxBuffer[2], UID_SIZE);
+
+        // Đọc weight dưới dạng số nguyên big-endian
+        weight = ((int32_t)rxBuffer[6] << 24) | 
+                 ((int32_t)rxBuffer[7] << 16) | 
+                 ((int32_t)rxBuffer[8] << 8) | 
+                 rxBuffer[9];
+
+        // Debug dữ liệu nhận được
+        Serial.printf("Received - UID: %02X:%02X:%02X:%02X, Weight: %ld\n",
+                      uid[0], uid[1], uid[2], uid[3], weight);
+
+        processCardDetected(uid, weight);
+    } else {
+        Serial.printf("Ignoring message type: 0x%02X\n", msgType);
     }
 }
 
-void processCardDetected(uint8_t* uid, float weight) {
+void processCardDetected(uint8_t* uid, int32_t weight) {
     // Check if card is in valid database
     bool isValid = isCardValid(uid);
     unsigned long currentTime = millis();
-    
+
     // Update latest reading
     memcpy(latestReading.uid, uid, UID_SIZE);
     latestReading.isValid = isValid;
-    latestReading.weight = weight;
+    latestReading.weight = weight; // Lưu weight dưới dạng int32_t
     latestReading.timestamp = currentTime;
     latestReading.hasData = true;
-    
+
     // Add to weight history
     addWeightRecord(uid, weight, currentTime, isValid);
-    
+
     // Log the detection
     String uidStr = uidToString(uid);
-    Serial.printf("Card Detected: %s, Weight: %.1fg, Valid: %s\n", 
+    Serial.printf("Card Detected: %s, Weight: %ld, Valid: %s\n", 
                   uidStr.c_str(), weight, isValid ? "YES" : "NO");
-    
-    // Optional: Send feedback to STM32 (LED control, buzzer, etc.)
-    // For now, we just log and store the data
-}
-
-void sendSystemResetToSTM32() {
-    uint8_t buffer[3];
-    buffer[0] = MSG_START_BYTE;
-    buffer[1] = MSG_TYPE_SYSTEM_RESET;
-    buffer[2] = MSG_END_BYTE;
-    
-    stm32Serial.write(buffer, 3);
-    Serial.println("Sent system reset command to STM32");
-}
-
-void sendConfigUpdateToSTM32() {
-    uint8_t buffer[3];
-    buffer[0] = MSG_START_BYTE;
-    buffer[1] = MSG_TYPE_CONFIG_UPDATE;
-    buffer[2] = MSG_END_BYTE;
-    
-    stm32Serial.write(buffer, 3);
-    Serial.println("Sent config update command to STM32");
 }
 
 // Utility Functions
@@ -451,13 +405,13 @@ bool isValidUID(String uidStr) {
     return true;
 }
 
-void addWeightRecord(uint8_t* uid, float weight, unsigned long timestamp, bool isValid) {
+void addWeightRecord(uint8_t* uid, int32_t weight, unsigned long timestamp, bool isValid) {
     memcpy(weightHistory[historyIndex].uid, uid, UID_SIZE);
-    weightHistory[historyIndex].weight = weight;
+    weightHistory[historyIndex].weight = weight; // Lưu weight dưới dạng int32_t
     weightHistory[historyIndex].timestamp = timestamp;
     weightHistory[historyIndex].valid = true;
     weightHistory[historyIndex].isValidCard = isValid;
-    
+
     historyIndex = (historyIndex + 1) % MAX_WEIGHT_HISTORY;
     if (historyCount < MAX_WEIGHT_HISTORY) {
         historyCount++;
@@ -469,7 +423,7 @@ String getWeightHistoryForCard(uint8_t* uid) {
     for (int i = 0; i < historyCount; i++) {
         int index = (historyIndex - 1 - i + MAX_WEIGHT_HISTORY) % MAX_WEIGHT_HISTORY;
         if (memcmp(weightHistory[index].uid, uid, UID_SIZE) == 0) {
-            history += String(weightHistory[index].weight, 1) + "g ";
+            history += String(weightHistory[index].weight) + " ";
         }
     }
     return history;
@@ -593,7 +547,6 @@ String getMainPage() {
     html += "<div class='actions'>";
     html += "<a href='/manage' class='btn btn-primary'>🏷️ Quản lý thẻ</a>";
     html += "<a href='/weight_history' class='btn btn-success'>📊 Lịch sử cân nặng</a>";
-    html += "<button onclick=\"fetch('/refresh',{method:'POST'}).then(()=>alert('Đã làm mới hệ thống!'))\" class='btn btn-warning'>🔄 Làm mới</button>";
     html += "</div></div></div></div></body></html>";
     return html;
 }
@@ -667,7 +620,7 @@ void handleData() {
     String json = "{";
     if (latestReading.hasData) {
         json += "\"lastCard\":\"" + uidToString(latestReading.uid) + "\",";
-        json += "\"weight\":" + String(latestReading.weight, 1) + ",";
+        json += "\"weight\":" + String(latestReading.weight) + ",";
         json += "\"valid\":" + String(latestReading.isValid ? "true" : "false") + ",";
         json += "\"timestamp\":" + String(latestReading.timestamp);
     } else {
@@ -731,11 +684,9 @@ void handleRemoveCard() {
     }
 }
 
-void handleRefresh() {
-    sendSystemResetToSTM32();
-    server.send(200, "text/plain", "System refresh command sent to STM32");
-}
 
+
+// Hàm handleWeightHistory
 void handleWeightHistory() {
     String html = "<!DOCTYPE html><html><head>";
     html += "<meta charset='UTF-8'>";
@@ -763,15 +714,15 @@ void handleWeightHistory() {
     html += "<div class='card'>";
     html += "<div class='card-title'>Dữ liệu cân nặng gần đây</div>";
     html += "<table class='table'><tr><th>Thời gian</th><th>UID thẻ</th><th>Cân nặng</th><th>Hợp lệ</th></tr>";
-    
+
     for (int i = 0; i < historyCount; i++) {
         int index = (historyIndex - 1 - i + MAX_WEIGHT_HISTORY) % MAX_WEIGHT_HISTORY;
         if (weightHistory[index].valid) {
             String timeStr = formatUptime(weightHistory[index].timestamp);
-            
+
             html += "<tr><td>" + timeStr + "</td>";
             html += "<td><code>" + uidToString(weightHistory[index].uid) + "</code></td>";
-            html += "<td><strong>" + String(weightHistory[index].weight, 1) + "g</strong></td>";
+            html += "<td><strong>" + String(weightHistory[index].weight) + "</strong></td>";
             if (weightHistory[index].isValidCard) {
                 html += "<td><span class='badge badge-success'>Hợp lệ</span></td></tr>";
             } else {
@@ -779,11 +730,10 @@ void handleWeightHistory() {
             }
         }
     }
-    
+
     html += "</table><br>";
     html += "<a href='/' class='btn'>🏠 Về trang chính</a>";
     html += "</div></div></body></html>";
     sendHTMLResponse(html);
 }
-
 
